@@ -1,0 +1,168 @@
+name: Build and Publish to PyPI
+
+on:
+  push:
+    tags:
+      - 'py-v*'
+  workflow_dispatch:
+
+jobs:
+  build-native-libraries:
+    name: Build Native Libraries
+    strategy:
+      matrix:
+        include:
+          # Linux builds
+          - os: ubuntu-latest
+            goos: linux
+            goarch: amd64
+            output: libprompttoquery_linux_amd64.so
+          - os: ubuntu-latest
+            goos: linux
+            goarch: arm64
+            output: libprompttoquery_linux_arm64.so
+
+          # Linux Alpine/musl builds
+          - os: ubuntu-latest
+            goos: linux
+            goarch: amd64
+            output: libprompttoquery_linux_amd64_musl.so
+            alpine: true
+          - os: ubuntu-latest
+            goos: linux
+            goarch: arm64
+            output: libprompttoquery_linux_arm64_musl.so
+            alpine: true
+
+          # macOS builds
+          - os: macos-latest
+            goos: darwin
+            goarch: amd64
+            output: libprompttoquery_darwin_amd64.dylib
+          - os: macos-latest
+            goos: darwin
+            goarch: arm64
+            output: libprompttoquery_darwin_arm64.dylib
+
+          # Windows builds
+          - os: ubuntu-latest
+            goos: windows
+            goarch: amd64
+            output: prompttoquery_windows_amd64.dll
+            cc: x86_64-w64-mingw32-gcc
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Install cross-compilation tools (Windows)
+        if: matrix.goos == 'windows'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mingw-w64
+
+      - name: Install musl tools (Alpine builds)
+        if: matrix.alpine == true
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+
+      - name: Build native library (Standard)
+        if: matrix.alpine != true
+        env:
+          CGO_ENABLED: 1
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CC: ${{ matrix.cc }}
+        run: |
+          cd core/src
+          go build -buildmode=c-shared -o ../build/${{ matrix.output }} .
+
+      - name: Build native library (Alpine/musl)
+        if: matrix.alpine == true
+        env:
+          CGO_ENABLED: 1
+          GOOS: linux
+          GOARCH: ${{ matrix.goarch }}
+          CC: musl-gcc
+        run: |
+          cd core/src
+          go build -buildmode=c-shared -o ../build/${{ matrix.output }} .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.output }}
+          path: core/build/${{ matrix.output }}
+          retention-days: 1
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: build-native-libraries
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine setuptools wheel
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare library directory
+        run: |
+          mkdir -p sdk/python/prompt_to_query/lib
+          find artifacts -type f -exec cp {} sdk/python/prompt_to_query/lib/ \;
+          ls -lh sdk/python/prompt_to_query/lib/
+
+      - name: Build package
+        run: |
+          cd sdk/python
+          python -m build
+
+      - name: Check distribution
+        run: |
+          cd sdk/python
+          twine check dist/*
+
+      - name: Publish to Test PyPI (optional)
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
+        run: |
+          cd sdk/python
+          twine upload --repository testpypi dist/* || echo "Test PyPI upload skipped"
+
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          cd sdk/python
+          twine upload dist/*
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: sdk/python/dist/*
+          generate_release_notes: true

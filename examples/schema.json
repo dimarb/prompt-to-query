@@ -1,0 +1,234 @@
+{
+  "collections": [
+    {
+      "name": "users",
+      "description": "User accounts in the system",
+      "fields": [
+        {
+          "name": "_id",
+          "type": "ObjectId",
+          "description": "Unique identifier"
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "indexed": true,
+          "unique": true,
+          "description": "User email address"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "description": "User full name"
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "enum": ["active", "inactive", "suspended"],
+          "description": "Account status"
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "enum": ["user", "admin", "manager"],
+          "description": "User role"
+        },
+        {
+          "name": "createdAt",
+          "type": "date",
+          "description": "Account creation date"
+        },
+        {
+          "name": "lastLogin",
+          "type": "date",
+          "description": "Last login timestamp"
+        },
+        {
+          "name": "profile",
+          "type": "object",
+          "description": "User profile information",
+          "schema": {
+            "age": {
+              "type": "number",
+              "description": "User age"
+            },
+            "city": {
+              "type": "string",
+              "description": "City of residence"
+            },
+            "country": {
+              "type": "string",
+              "description": "Country code"
+            },
+            "phoneNumber": {
+              "type": "string",
+              "description": "Contact phone number"
+            }
+          }
+        }
+      ],
+      "indexes": ["email", "status", "createdAt"]
+    },
+    {
+      "name": "products",
+      "description": "Product catalog",
+      "fields": [
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "indexed": true,
+          "description": "Product name"
+        },
+        {
+          "name": "sku",
+          "type": "string",
+          "unique": true,
+          "indexed": true,
+          "description": "Stock keeping unit"
+        },
+        {
+          "name": "price",
+          "type": "number",
+          "description": "Product price in USD"
+        },
+        {
+          "name": "categoryId",
+          "type": "ObjectId",
+          "description": "Reference to category",
+          "ref": "categories"
+        },
+        {
+          "name": "stock",
+          "type": "number",
+          "description": "Available stock quantity"
+        },
+        {
+          "name": "salesCount",
+          "type": "number",
+          "description": "Total number of sales"
+        },
+        {
+          "name": "rating",
+          "type": "number",
+          "description": "Average rating (0-5)"
+        },
+        {
+          "name": "tags",
+          "type": "array",
+          "items": "string",
+          "description": "Product tags"
+        },
+        {
+          "name": "isActive",
+          "type": "boolean",
+          "description": "Whether product is active"
+        },
+        {
+          "name": "createdAt",
+          "type": "date"
+        }
+      ],
+      "indexes": ["name", "sku", "categoryId", "price"]
+    },
+    {
+      "name": "categories",
+      "description": "Product categories",
+      "fields": [
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "indexed": true,
+          "unique": true,
+          "description": "Category name"
+        },
+        {
+          "name": "slug",
+          "type": "string",
+          "unique": true,
+          "description": "URL-friendly identifier"
+        },
+        {
+          "name": "parentId",
+          "type": "ObjectId",
+          "description": "Parent category reference",
+          "ref": "categories"
+        },
+        {
+          "name": "description",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "orders",
+      "description": "Customer orders",
+      "fields": [
+        {
+          "name": "_id",
+          "type": "ObjectId"
+        },
+        {
+          "name": "orderNumber",
+          "type": "string",
+          "unique": true,
+          "indexed": true,
+          "description": "Order number"
+        },
+        {
+          "name": "userId",
+          "type": "ObjectId",
+          "description": "User who placed the order",
+          "ref": "users"
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "enum": ["pending", "processing", "shipped", "delivered", "cancelled"],
+          "description": "Order status"
+        },
+        {
+          "name": "items",
+          "type": "array",
+          "description": "Order items",
+          "items": {
+            "type": "object",
+            "schema": {
+              "productId": {
+                "type": "ObjectId",
+                "ref": "products"
+              },
+              "quantity": {
+                "type": "number"
+              },
+              "price": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "name": "totalAmount",
+          "type": "number",
+          "description": "Total order amount"
+        },
+        {
+          "name": "createdAt",
+          "type": "date"
+        },
+        {
+          "name": "updatedAt",
+          "type": "date"
+        }
+      ],
+      "indexes": ["orderNumber", "userId", "status", "createdAt"]
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+# Tests
+test/
+*.test.js
+*.spec.js
+
+# Development files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Documentation (included in README)
+docs/
+
+# Examples (link to repo instead)
+examples/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.travis.yml
+.circleci/
+
+# Build artifacts (we want to include the built libraries)
+# Don't ignore anything in src/ or lib directories
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+*.sublime-project
+*.sublime-workspace
+
+# Temporary files
+*.tmp
+*.temp

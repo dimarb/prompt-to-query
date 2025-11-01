@@ -1,0 +1,66 @@
+{
+  "name": "prompt-to-query",
+  "version": "1.0.14",
+  "description": "High-performance SDK to convert natural language prompts to MongoDB queries using AI (OpenAI GPT or Anthropic Claude)",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "scripts": {
+    "test": "node test/test.js",
+    "postinstall": "node scripts/postinstall.js",
+    "build:native": "./scripts/build-native.sh",
+    "build:all": "./scripts/build-native.sh --all",
+    "prepublishOnly": "npm run build:all && npm test"
+  },
+  "keywords": [
+    "mongodb",
+    "query",
+    "natural-language",
+    "nlp",
+    "ai",
+    "llm",
+    "openai",
+    "gpt",
+    "gpt-4",
+    "anthropic",
+    "claude",
+    "database",
+    "text-to-query",
+    "prompt-engineering",
+    "sdk"
+  ],
+  "author": {
+    "name": "Dimar Borda",
+    "email": "dimarborda@gmail.com"
+  },
+  "license": "MIT",
+  "optionalDependencies": {
+    "koffi": "^2.14.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dimarborda/prompt-to-query.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dimarborda/prompt-to-query/issues"
+  },
+  "homepage": "https://github.com/dimarborda/prompt-to-query#readme",
+  "files": [
+    "src/",
+    "scripts/",
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
+  "os": [
+    "linux",
+    "darwin",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
+}
