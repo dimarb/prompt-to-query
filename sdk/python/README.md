@@ -79,6 +79,6 @@ MIT License - see LICENSE file for details
 
 ## Links
 
-- **GitHub**: https://github.com/dimarborda/prompt-to-query
+- **GitHub**: https://github.com/dimarb/prompt-to-query
 - **PyPI**: https://pypi.org/project/prompt-to-query/
-- **Issues**: https://github.com/dimarborda/prompt-to-query/issues
+- **Issues**: https://github.com/dimarb/prompt-to-query/issues

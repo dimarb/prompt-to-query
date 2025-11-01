@@ -562,8 +562,8 @@ MIT
 
 ## Soporte
 
-- **Issues**: [GitHub Issues](https://github.com/dimarborda/prompt-to-query/issues)
-- **Documentación completa**: [GitHub](https://github.com/dimarborda/prompt-to-query)
+- **Issues**: [GitHub Issues](https://github.com/dimarb/prompt-to-query/issues)
+- **Documentación completa**: [GitHub](https://github.com/dimarb/prompt-to-query)
 - **Ejemplos**: Ver directorio `examples/`
 
 ---
