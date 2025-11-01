@@ -68,4 +68,6 @@ htmlcov/
 logs/
 core/
 docs/private/
+sdk/javascript/docs/private
+sdk/python/docs/private
 
